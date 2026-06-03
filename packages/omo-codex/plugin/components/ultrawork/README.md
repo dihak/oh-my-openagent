@@ -13,14 +13,14 @@ Bundled Codex agent role TOMLs in `agents/` are installed into `CODEX_HOME/agent
 | Surface + paired cleanup | Execution loop step 4 (**SURFACE-AS-SCENARIO**) runs the chosen channel scenario end-to-end. Step 5 (**CLEANUP, PAIRED**) tears down every QA-spawned process / tmux session / browser context / container / port / temp dir, with a one-line receipt appended to the notepad. Leftover state → NOT done. |
 | Durable /tmp notepad | `mktemp -t ulw-$(date +%Y%m%d-%H%M%S).XXXXXX.md` with sections `Plan`, `Success criteria + QA scenarios`, `Now`, `Todo`, `Findings`, `Learnings`. **Append**, never rewrite. |
 | Obsessive atomic todos | Every action — even one-line edits, `ls`, single test runs — becomes a todo. Format: `path: <action> for <criterion> — verify by <check>`. One in_progress at a time, mark completed immediately. |
-| GPT-5.2 xhigh verification gate | Triggered automatically on user-requested rigor, 3+ files, 20+ turns, 30+ minutes, or refactor/migration/perf/security work. Use the bundled `codex-ultrawork-reviewer` agent role when available. Reviewer verdict is **binding** — no "false positive", no minimising, no arguing. Loop until **unconditional** approval. "Looks good but…" = REJECTION. |
+| ChatGPT-compatible xhigh verification gate | Triggered automatically on user-requested rigor, 3+ files, 20+ turns, 30+ minutes, or refactor/migration/perf/security work. Use the bundled `codex-ultrawork-reviewer` agent role when available. Reviewer verdict is **binding**: no "false positive", no minimising, no arguing. Loop until **unconditional** approval. "Looks good but..." = REJECTION. |
 
 The directive is currently 10,951 chars / 231 lines and follows the GPT-5.5 prompting structure (Role / Goal / Manual-QA channels / Bootstrap / Execution loop / Verification gate / Commits / Constraints / Output / Stop rules).
 
 ## Install (via this marketplace)
 
 ```bash
-bunx lazycodex-ai install
+npx lazycodex-ai install
 ```
 
 The installer copies the plugin into `~/.codex/plugins/cache/sisyphuslabs/omo/0.1.0`, writes the stable Codex marketplace snapshot at `~/.codex/.tmp/marketplaces/sisyphuslabs/`, registers the `sisyphuslabs` marketplace from the `lazycodex` Git repository, enables `omo@sisyphuslabs` in `~/.codex/config.toml`, registers the `UserPromptSubmit` hook, and installs the bundled agent TOMLs into `~/.codex/agents/` (symlinks on Unix, copies on Windows). A `.installed-agents.json` manifest is written next to the bundled TOMLs' source root for clean uninstall tracking.
@@ -49,7 +49,7 @@ Expect `<ultrawork-mode>` ... directive body.
 
 ## Agent role smoke test
 
-Run `bunx omo install --platform=codex`, then inspect `~/.codex/agents/`. On Linux / macOS you should see symlinks; on Windows you should see file copies. Each TOML should declare a non-empty `name`, `description`, and `developer_instructions`.
+Run `npx lazycodex-ai install`, then inspect `~/.codex/agents/`. On Linux / macOS you should see symlinks; on Windows you should see file copies. Each TOML should declare a non-empty `name`, `description`, and `developer_instructions`.
 
 ## License
 
