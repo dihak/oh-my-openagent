@@ -42,7 +42,7 @@ describe("rules formatter hook context", () => {
 		);
 	});
 
-	it("#given static rules #when formatting SessionStart context #then it avoids leading blank lines", () => {
+	it("#given static rules #when formatting SessionStart context #then it injects rule bodies inline", () => {
 		// given
 		const rule = loadedRule({
 			path: "/repo/CONTEXT.md",
@@ -79,7 +79,7 @@ describe("rules formatter hook context", () => {
 		expect(block).not.toContain("\r");
 	});
 
-	it("#given duplicate static rules with different line endings #when formatting context #then it renders one copy", () => {
+	it("#given duplicate static rules with different line endings #when formatting context #then it injects one copy", () => {
 		// given
 		const lfRule = loadedRule({
 			path: "/repo/CONTEXT.md",
@@ -96,8 +96,73 @@ describe("rules formatter hook context", () => {
 		const block = formatStaticBlock([lfRule, crlfRule], FORMAT_OPTIONS);
 
 		// then
+		expect(occurrenceCount(block, "Instructions from: /repo/CONTEXT.md")).toBe(1);
 		expect(occurrenceCount(block, "Shared rule\nKeep one copy.")).toBe(1);
 		expect(block).not.toContain("/repo/packages/CONTEXT.md");
+	});
+
+	it("#given a Hephaestus static rule #when formatting SessionStart context #then it injects its body before other rule bodies", () => {
+		// given
+		const rules = [
+			loadedRule({ path: "/repo/alpha.md", relativePath: "alpha.md", body: "Alpha guidance." }),
+			loadedRule({
+				path: "/repo/bundled-rules/hephaestus.md",
+				relativePath: "bundled-rules/hephaestus.md",
+				body: "Hephaestus guidance.",
+			}),
+			loadedRule({ path: "/repo/beta.md", relativePath: "beta.md", body: "Beta guidance." }),
+		];
+
+		// when
+		const block = formatStaticBlock(rules, FORMAT_OPTIONS);
+
+		// then
+		expect(block).toContain("Instructions from: /repo/bundled-rules/hephaestus.md");
+		expect(block).toContain("Hephaestus guidance.");
+		expect(block).toContain("Alpha guidance.");
+		expect(block).toContain("Beta guidance.");
+		expect(block.indexOf("Hephaestus guidance.")).toBeLessThan(block.indexOf("Alpha guidance."));
+		expect(block.indexOf("Alpha guidance.")).toBeLessThan(block.indexOf("Beta guidance."));
+		expect(block).not.toContain("must read project rules:");
+		expect(block).not.toContain("- [hephaestus.md]");
+	});
+
+	it("#given only a Hephaestus static rule #when formatting SessionStart context #then it emits no project rule link section", () => {
+		// given
+		const rule = loadedRule({
+			path: "/repo/bundled-rules/hephaestus.md",
+			relativePath: "bundled-rules/hephaestus.md",
+			body: "Hephaestus guidance.",
+		});
+
+		// when
+		const block = formatStaticBlock([rule], FORMAT_OPTIONS);
+
+		// then
+		expect(block).toContain("Instructions from: /repo/bundled-rules/hephaestus.md");
+		expect(block).toContain("Hephaestus guidance.");
+		expect(block).not.toContain("- [hephaestus.md]");
+		expect(block).not.toContain("must read project rules:");
+	});
+
+	it("#given an oversized Hephaestus static rule #when formatting under a tight result budget #then its body is never truncated", () => {
+		// given
+		const tailMarker = "HEPHAESTUS_TAIL_SENTINEL";
+		const rule = loadedRule({
+			path: "/repo/bundled-rules/hephaestus.md",
+			relativePath: "bundled-rules/hephaestus.md",
+			body: `${"H".repeat(500)}\n\n${tailMarker}`,
+		});
+
+		// when
+		const block = formatStaticBlock([rule], {
+			maxRuleChars: 120,
+			maxResultChars: 200,
+		});
+
+		// then
+		expect(block).toContain(tailMarker);
+		expect(block).not.toContain("[Truncated. Full:");
 	});
 
 	it("#given multiple oversized rules #when formatting under a tight result budget #then every rule receives a fair truncated share with a read-full guide", () => {

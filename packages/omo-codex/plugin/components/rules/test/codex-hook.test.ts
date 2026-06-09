@@ -218,6 +218,9 @@ describe("codex rules hooks", () => {
 		const parsed = parseHookOutput(output);
 		expect(parsed.hookSpecificOutput?.hookEventName).toBe("SessionStart");
 		expect(parsed.hookSpecificOutput?.additionalContext).toContain("## Project Instructions");
+		expect(parsed.hookSpecificOutput?.additionalContext).toContain(
+			`Instructions from: ${path.join(root, "CONTEXT.md")}`,
+		);
 		expect(parsed.hookSpecificOutput?.additionalContext).toContain("Always wear safety goggles");
 	});
 
@@ -234,7 +237,9 @@ describe("codex rules hooks", () => {
 		const parsed = parseHookOutput(output);
 		expect(parsed.hookSpecificOutput?.additionalContext).toContain("## Project Instructions");
 		expect(parsed.hookSpecificOutput?.additionalContext).not.toContain("Project AGENTS.md should stay Codex-native.");
-		expect(parsed.hookSpecificOutput?.additionalContext).not.toContain("Project CLAUDE.md should stay outside rules hook context.");
+		expect(parsed.hookSpecificOutput?.additionalContext).not.toContain(
+			"Project CLAUDE.md should stay outside rules hook context.",
+		);
 	});
 
 	it("#given project AGENTS.md #when SessionStart runs #then rules hook leaves AGENTS.md to Codex native handling", async () => {
@@ -307,9 +312,10 @@ describe("codex rules hooks", () => {
 
 		// then
 		expect(resumeOutput).toBe("");
-		expect(parseHookOutput(clearOutput).hookSpecificOutput?.additionalContext).toContain(
-			"Always wear safety goggles",
-		);
+		const clearContext = parseHookOutput(clearOutput).hookSpecificOutput?.additionalContext ?? "";
+		expect(clearContext).toContain("## Project Instructions");
+		expect(clearContext).toContain(`Instructions from: ${path.join(root, "CONTEXT.md")}`);
+		expect(clearContext).toContain("Always wear safety goggles");
 	});
 
 	it("#given static context remains in transcript but cache is missing #when SessionStart runs #then it emits no duplicate context", async () => {
