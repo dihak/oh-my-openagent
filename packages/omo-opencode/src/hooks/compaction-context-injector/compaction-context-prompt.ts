@@ -5,6 +5,11 @@ import {
 
 export const COMPACTION_CONTEXT_PROMPT = `${createSystemDirective(SystemDirectiveTypes.COMPACTION_CONTEXT)}
 
+## Compaction execution rules (mandatory)
+- You have **no tools** for this turn. Do not call grep, read, glob, bash, webfetch, MCP tools, or any other tool.
+- Any tool call **aborts** compaction and fails the session (for example: "Tool call not allowed while generating summary").
+- Output **only** markdown text using the section structure from the summarize instructions above. Do not invoke tools to discover file paths or code; use paths and facts already present in the conversation history.
+
 When summarizing this session, keep the result compact and continuation-focused. Prefer terse bullets over replaying the transcript.
 
 ## 1. User Requests

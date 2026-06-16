@@ -20,6 +20,7 @@ afterAll(() => {
 
 import type { BackgroundManager } from "../../features/background-agent"
 import { TaskHistory } from "../../features/background-agent/task-history"
+import { COMPACTION_CONTEXT_PROMPT } from "./compaction-context-prompt"
 import { createCompactionContextInjector } from "./index"
 
 function createMockBackgroundManager(): BackgroundManager {
@@ -27,6 +28,16 @@ function createMockBackgroundManager(): BackgroundManager {
 }
 
 describe("createCompactionContextInjector prompt", () => {
+  it("includes mandatory no-tool compaction rules in the injected context", () => {
+    // given / when
+    const prompt = COMPACTION_CONTEXT_PROMPT
+
+    // then
+    expect(prompt).toContain("Compaction execution rules (mandatory)")
+    expect(prompt).toContain("no tools")
+    expect(prompt).toContain("grep")
+    expect(prompt).toContain("Tool call not allowed while generating summary")
+  })
 
   describe("Delegated Agent Sessions", () => {
     it("injects actual task history when backgroundManager and sessionID provided", async () => {
