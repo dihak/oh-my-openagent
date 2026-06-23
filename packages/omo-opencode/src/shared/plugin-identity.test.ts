@@ -12,13 +12,14 @@ import {
 
 describe("plugin-identity constants", () => {
   describe("PLUGIN_NAME", () => {
-    it("equals oh-my-openagent", () => {
+    it("matches published package name from root package.json", () => {
       // given
 
       // when
 
       // then
-      expect(PLUGIN_NAME).toBe("oh-my-openagent")
+      expect(PLUGIN_NAME).toBe(PUBLISHED_PACKAGE_NAME)
+      expect(PLUGIN_NAME.length).toBeGreaterThan(0)
     })
   })
 
@@ -49,7 +50,8 @@ describe("plugin-identity constants", () => {
       // when
 
       // then
-      expect(ACCEPTED_PACKAGE_NAMES).toEqual([PLUGIN_NAME, LEGACY_PLUGIN_NAME])
+      expect(ACCEPTED_PACKAGE_NAMES[0]).toBe(PUBLISHED_PACKAGE_NAME)
+      expect(ACCEPTED_PACKAGE_NAMES).toContain(LEGACY_PLUGIN_NAME)
     })
   })
 

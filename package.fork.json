@@ -1,0 +1,16 @@
+{
+  "name": "@dihak/oh-my-openagent",
+  "version": "4.13.0-dihak.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dihak/oh-my-openagent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dihak/oh-my-openagent/issues"
+  },
+  "homepage": "https://github.com/dihak/oh-my-openagent#readme",
+  "optionalDependencies": {}
+}

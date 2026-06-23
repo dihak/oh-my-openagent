@@ -1,15 +1,6 @@
-import { createProductIdentity } from "@oh-my-opencode/utils"
+import { loadPublishedProductIdentity } from "@oh-my-opencode/utils"
 
-const PRODUCT_IDENTITY = createProductIdentity({
-  pluginName: "oh-my-openagent",
-  legacyPluginName: "oh-my-opencode",
-  publishedPackageName: "oh-my-openagent",
-  acceptedPackageNames: ["oh-my-openagent", "oh-my-opencode"],
-  configBasename: "oh-my-openagent",
-  legacyConfigBasename: "oh-my-opencode",
-  logFileName: "oh-my-opencode.log",
-  cacheDirName: "oh-my-opencode",
-})
+const PRODUCT_IDENTITY = loadPublishedProductIdentity()
 
 export const PLUGIN_NAME = PRODUCT_IDENTITY.pluginName
 export const LEGACY_PLUGIN_NAME = PRODUCT_IDENTITY.legacyPluginName

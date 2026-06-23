@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import type { ConfigMergeResult } from "../types"
-import { PLUGIN_NAME, LEGACY_PLUGIN_NAME } from "../../shared"
+import { LEGACY_PLUGIN_NAME, PLUGIN_NAME, PUBLISHED_PACKAGE_NAME } from "../../shared"
 import { backupConfigFile } from "./backup-config"
 import { getConfigDir } from "./config-context"
 import { ensureConfigDirectoryExists } from "./ensure-config-directory-exists"
@@ -76,8 +76,10 @@ function isSourceOmoPluginEntry(plugin: string): boolean {
 }
 
 function isPackageOmoPluginEntry(plugin: string): boolean {
-  return plugin === PLUGIN_NAME || plugin.startsWith(`${PLUGIN_NAME}@`) ||
-    plugin === LEGACY_PLUGIN_NAME || plugin.startsWith(`${LEGACY_PLUGIN_NAME}@`)
+  const names = [PLUGIN_NAME, PUBLISHED_PACKAGE_NAME, LEGACY_PLUGIN_NAME, "oh-my-openagent"]
+  return names.some(
+    (name) => plugin === name || plugin.startsWith(`${name}@`),
+  )
 }
 
 function isOurPlugin(plugin: string): boolean {
@@ -218,7 +220,7 @@ export async function addPluginToOpenCodeConfig(currentVersion: string): Promise
   const preferredSourceEntry = targets
     .map((target) => findSourcePluginEntryInTarget(target))
     .find((entry): entry is string => entry !== null) ?? null
-  const pluginEntry = await getPluginNameWithVersion(currentVersion, PLUGIN_NAME)
+  const pluginEntry = await getPluginNameWithVersion(currentVersion, PUBLISHED_PACKAGE_NAME)
 
   let primaryResult: ConfigMergeResult | null = null
   for (const target of targets) {

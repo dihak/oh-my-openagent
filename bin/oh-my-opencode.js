@@ -173,6 +173,23 @@ function main() {
     .filter((entry) => entry !== null);
 
   if (resolvedBinaries.length === 0) {
+    const cliNodePath = fileURLToPath(new URL("../dist/cli-node/index.js", import.meta.url));
+    if (existsSync(cliNodePath)) {
+      const childEnv = {
+        ...process.env,
+        OMO_INVOCATION_NAME: invocationName,
+        OMO_WRAPPER_PACKAGE_ROOT: getWrapperPackageRoot(),
+      };
+      const result = spawnSync(process.execPath, [cliNodePath, ...process.argv.slice(2)], {
+        stdio: "inherit",
+        env: childEnv,
+      });
+      if (result.signal) {
+        process.exit(getSignalExitCode(result.signal));
+      }
+      process.exit(result.status ?? 1);
+    }
+
     console.error(`\noh-my-opencode: Platform binary not installed.`);
     console.error(`\nYour platform: ${platform}-${arch}${libcFamily === "musl" ? "-musl" : ""}`);
     console.error(`Expected packages (in order): ${packageCandidates.join(", ")}`);

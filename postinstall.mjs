@@ -15,7 +15,15 @@ import { detectPlatformBinaryMismatch } from "./bin/version-mismatch.js";
 const require = createRequire(import.meta.url);
 
 const MIN_OPENCODE_VERSION = "1.4.0";
-const OPENCODE_PLUGIN_PACKAGES = ["oh-my-opencode", "oh-my-openagent"];
+function getOpenCodePluginCachePrefixes() {
+  const packageJson = readMainPackageJson();
+  const name = packageJson?.name;
+  const names = ["oh-my-opencode", "oh-my-openagent"];
+  if (name && !names.includes(name)) {
+    names.unshift(name);
+  }
+  return names;
+}
 
 /**
  * Parse version string into numeric parts
@@ -106,7 +114,7 @@ function getMainPackageVersion() {
 function invalidateOpenCodePluginCache() {
   const cacheDir = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "opencode");
   const parentDirs = [cacheDir, join(cacheDir, "packages")];
-  const prefixes = OPENCODE_PLUGIN_PACKAGES.map((packageName) => `${packageName}@`);
+  const prefixes = getOpenCodePluginCachePrefixes().map((packageName) => `${packageName}@`);
 
   for (const parentDir of parentDirs) {
     try {
@@ -132,6 +140,12 @@ function readPlatformPackageVersion(pkg) {
 }
 
 function main() {
+  if (process.env.OMO_SKIP_PLATFORM_BINARY === "1") {
+    invalidateOpenCodePluginCache();
+    console.log("✓ oh-my-opencode: platform binary check skipped (OMO_SKIP_PLATFORM_BINARY=1); CLI uses dist/cli-node when needed.");
+    return;
+  }
+
   const { platform, arch } = process;
   const libcFamily = getLibcFamily();
   const packageBaseName = getPackageBaseName();
