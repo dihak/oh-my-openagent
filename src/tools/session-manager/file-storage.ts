@@ -4,6 +4,7 @@ import { join } from "node:path"
 import { MESSAGE_STORAGE, PART_STORAGE, SESSION_STORAGE, TODO_DIR, TRANSCRIPT_DIR } from "./constants"
 import { getMessageDir } from "../../shared/opencode-message-dir"
 import type { SessionInfo, SessionMessage, SessionMetadata, TodoItem } from "./types"
+import { sessionDirectoriesMatch } from "./directory-filter"
 
 export async function getFileMainSessions(directory?: string): Promise<SessionMetadata[]> {
   if (!existsSync(SESSION_STORAGE)) return []
@@ -24,7 +25,7 @@ export async function getFileMainSessions(directory?: string): Promise<SessionMe
           const content = await readFile(join(projectPath, file), "utf-8")
           const meta = JSON.parse(content) as SessionMetadata
           if (meta.parentID) continue
-          if (directory && meta.directory !== directory) continue
+          if (directory && !sessionDirectoriesMatch(meta.directory, directory)) continue
           sessions.push(meta)
         } catch {
           continue
